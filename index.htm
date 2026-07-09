@@ -327,7 +327,7 @@
     </div>
 
     <div class="field">
-      <label for="ccs">CCs ou outros adicionais com reflexo em GAO/PVTAC (R$)</label>
+      <label for="ccs">Adicionais com reflexo em GAO/PVTAC (R$)</label>
       <input type="number" id="ccs" value="0" min="0" step="0.01">
     </div>
   </div>
@@ -337,11 +337,11 @@
     <div class="card-title">Composição da remuneração bruta</div>
     <div class="row"><span class="lbl">Subsídio básico mensal</span><span class="val" id="vSub"></span></div>
     <div class="row"><span class="lbl">GECO (pontos × 1/90 do subsídio)</span><span class="val" id="vGeco"></span></div>
-    <div class="row"><span class="lbl">CCs ou outros adicionais c/ reflexo em GAO/PVTAC</span><span class="val" id="vCcs"></span></div>
-    <div class="row abate-teto" id="rowAbate" style="display:none"><span class="lbl">Abate-teto (excedente subsídio + CCs + GECO s/ PGR)</span><span class="val" id="vAbate"></span></div>
-    <div class="row sub"><span class="lbl">Subtotal subsídio + CCs + GECO (após abate-teto)</span><span class="val" id="vSubtotal"></span></div>
-    <div class="row sub"><span class="lbl">Base p/ GAO e PVTAC (subsídio + CCs)</span><span class="val" id="vBaseGao"></span></div>
-    <div class="row"><span class="lbl">GAO (35% da base subsídio + CCs — indenizatória)</span><span class="val" id="vGao"></span></div>
+    <div class="row"><span class="lbl">Adicionais c/ reflexo em GAO/PVTAC</span><span class="val" id="vCcs"></span></div>
+    <div class="row abate-teto" id="rowAbate" style="display:none"><span class="lbl">Abate-teto (excedente subsídio + Adicionais + GECO s/ PGR)</span><span class="val" id="vAbate"></span></div>
+    <div class="row sub"><span class="lbl">Subtotal subsídio + adicionais + GECO (após abate-teto)</span><span class="val" id="vSubtotal"></span></div>
+    <div class="row sub"><span class="lbl">Base p/ GAO e PVTAC (subsídio + adicionais)</span><span class="val" id="vBaseGao"></span></div>
+    <div class="row"><span class="lbl">GAO (35% da base subsídio + adicionais — indenizatória)</span><span class="val" id="vGao"></span></div>
     <div class="row"><span class="lbl">PVTAC — Adicional por quinquênio (5% da base)</span><span class="val" id="vPvtac"></span></div>
     <div class="row sub"><span class="lbl">Nº de quinquênios: <strong id="vNQuinq"></strong> — Percentual: <strong id="vPctPvtac"></strong></span><span class="val"></span></div>
     <div class="row"><span class="lbl">Auxílio-saúde (ressarcimento)</span><span class="val" id="vSaude"></span></div>
@@ -373,7 +373,7 @@
   <!-- LÍQUIDA -->
   <div class="card">
     <div class="card-title">Remuneração líquida</div>
-    <div class="row"><span class="lbl">Subsídio + CCs + GECO líquido (após abate-teto e descontos)</span><span class="val" id="vSubLiq"></span></div>
+    <div class="row"><span class="lbl">Subsídio + adicionais + GECO líquido (após abate-teto e descontos)</span><span class="val" id="vSubLiq"></span></div>
     <div class="row"><span class="lbl">GAO (indenizatória, isenta)</span><span class="val" id="vGaoLiq"></span></div>
     <div class="row"><span class="lbl">PVTAC (indenizatória, isenta)</span><span class="val" id="vPvtacLiq"></span></div>
     <div class="row"><span class="lbl">Auxílio-saúde (indenizatório, isento)</span><span class="val" id="vSaudeLiq"></span></div>
