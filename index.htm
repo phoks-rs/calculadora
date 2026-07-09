@@ -325,6 +325,11 @@
         <option value="15">15</option>
       </select>
     </div>
+
+    <div class="field">
+      <label for="ccs">CCs ou outros adicionais com reflexo em GAO/PVTAC (R$)</label>
+      <input type="number" id="ccs" value="0" min="0" step="0.01">
+    </div>
   </div>
 
   <!-- COMPOSIÇÃO BRUTA -->
@@ -332,10 +337,12 @@
     <div class="card-title">Composição da remuneração bruta</div>
     <div class="row"><span class="lbl">Subsídio básico mensal</span><span class="val" id="vSub"></span></div>
     <div class="row"><span class="lbl">GECO (pontos × 1/90 do subsídio)</span><span class="val" id="vGeco"></span></div>
-    <div class="row abate-teto" id="rowAbate" style="display:none"><span class="lbl">Abate-teto (excedente s/ PGR)</span><span class="val" id="vAbate"></span></div>
-    <div class="row sub"><span class="lbl">Subtotal subsídio + GECO (após abate-teto)</span><span class="val" id="vSubtotal"></span></div>
-    <div class="row"><span class="lbl">GAO (35% do subsídio básico — indenizatória)</span><span class="val" id="vGao"></span></div>
-    <div class="row"><span class="lbl">PVTAC — Adicional por quinquênio (5% s/ subsídio básico)</span><span class="val" id="vPvtac"></span></div>
+    <div class="row"><span class="lbl">CCs ou outros adicionais c/ reflexo em GAO/PVTAC</span><span class="val" id="vCcs"></span></div>
+    <div class="row abate-teto" id="rowAbate" style="display:none"><span class="lbl">Abate-teto (excedente subsídio + CCs + GECO s/ PGR)</span><span class="val" id="vAbate"></span></div>
+    <div class="row sub"><span class="lbl">Subtotal subsídio + CCs + GECO (após abate-teto)</span><span class="val" id="vSubtotal"></span></div>
+    <div class="row sub"><span class="lbl">Base p/ GAO e PVTAC (subsídio + CCs)</span><span class="val" id="vBaseGao"></span></div>
+    <div class="row"><span class="lbl">GAO (35% da base subsídio + CCs — indenizatória)</span><span class="val" id="vGao"></span></div>
+    <div class="row"><span class="lbl">PVTAC — Adicional por quinquênio (5% da base)</span><span class="val" id="vPvtac"></span></div>
     <div class="row sub"><span class="lbl">Nº de quinquênios: <strong id="vNQuinq"></strong> — Percentual: <strong id="vPctPvtac"></strong></span><span class="val"></span></div>
     <div class="row"><span class="lbl">Auxílio-saúde (ressarcimento)</span><span class="val" id="vSaude"></span></div>
     <div class="row highlight"><span class="lbl">Remuneração bruta total</span><span class="val" id="vBruto"></span></div>
@@ -366,7 +373,7 @@
   <!-- LÍQUIDA -->
   <div class="card">
     <div class="card-title">Remuneração líquida</div>
-    <div class="row"><span class="lbl">Subsídio + GECO líquido (após abate-teto e descontos)</span><span class="val" id="vSubLiq"></span></div>
+    <div class="row"><span class="lbl">Subsídio + CCs + GECO líquido (após abate-teto e descontos)</span><span class="val" id="vSubLiq"></span></div>
     <div class="row"><span class="lbl">GAO (indenizatória, isenta)</span><span class="val" id="vGaoLiq"></span></div>
     <div class="row"><span class="lbl">PVTAC (indenizatória, isenta)</span><span class="val" id="vPvtacLiq"></span></div>
     <div class="row"><span class="lbl">Auxílio-saúde (indenizatório, isento)</span><span class="val" id="vSaudeLiq"></span></div>
@@ -456,14 +463,16 @@ function calc() {
   const aliqFun = parseFloat(document.getElementById('aliqFun').value);
   const saude = parseFloat(document.getElementById('saude').value) || 0;
   const gecoPts = parseInt(document.getElementById('geco').value);
+  const ccs = parseFloat(document.getElementById('ccs').value) || 0;
 
   // Composição bruta
   const geco = gecoPts * (subsidio / 90);
-  const abateTeto = Math.max(subsidio + geco - PGR, 0);
-  const subtotal = subsidio + geco - abateTeto;
-  const gao = subsidio * 0.35;
+  const abateTeto = Math.max(subsidio + ccs + geco - PGR, 0);
+  const subtotal = subsidio + ccs + geco - abateTeto;
+  const baseGao = subsidio + ccs;
+  const gao = baseGao * 0.35;
   const nQuinq = Math.floor(tempo / 5);
-  const pvtac = nQuinq * 0.05 * subsidio;
+  const pvtac = nQuinq * 0.05 * baseGao;
   const bruto = subtotal + gao + pvtac + saude;
   const indenz = gao + pvtac + saude;
 
@@ -485,6 +494,7 @@ function calc() {
   // Render
   document.getElementById('vSub').textContent = fmt(subsidio);
   document.getElementById('vGeco').textContent = fmt(geco);
+  document.getElementById('vCcs').textContent = fmt(ccs);
 
   const rowAbate = document.getElementById('rowAbate');
   if (abateTeto > 0) {
@@ -495,6 +505,7 @@ function calc() {
   }
 
   document.getElementById('vSubtotal').textContent = fmt(subtotal);
+  document.getElementById('vBaseGao').textContent = fmt(baseGao);
   document.getElementById('vGao').textContent = fmt(gao);
   document.getElementById('vPvtac').textContent = fmt(pvtac);
   document.getElementById('vNQuinq').textContent = nQuinq;
