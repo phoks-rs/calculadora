@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Remuneração — Membros MPF/MPU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f6f7f9;
+    --surface: #ffffff;
+    --border: #e2e5ea;
+    --border-focus: #3b6db5;
+    --text: #1a2332;
+    --text-secondary: #5a6577;
+    --text-muted: #8793a4;
+    --accent: #1e4a8a;
+    --accent-light: #e8eef7;
+    --green: #15713e;
+    --green-bg: #e6f5ed;
+    --red: #b91c30;
+    --red-bg: #fde8eb;
+    --orange: #a65d00;
+    --orange-bg: #fff3e0;
+    --input-bg: #f0f4fa;
+    --radius: 10px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: 24px 16px 64px;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  /* ---- HEADER ---- */
+  header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding: 32px 24px 28px;
+    background: linear-gradient(135deg, #1e4a8a 0%, #2c5f9e 100%);
+    border-radius: var(--radius);
+    color: #fff;
+    box-shadow: var(--shadow-md);
+  }
+  header h1 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    margin-bottom: 6px;
+  }
+  header p {
+    font-size: .82rem;
+    opacity: .75;
+    font-weight: 400;
+  }
+
+  /* ---- SECTIONS ---- */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-sm);
+  }
+  .card-title {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--accent-light);
+  }
+
+  /* ---- FORM ROWS ---- */
+  .field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    gap: 16px;
+  }
+  .field + .field { border-top: 1px solid var(--border); }
+  .field label {
+    font-size: .88rem;
+    color: var(--text-secondary);
+    flex: 1;
+  }
+  .field select, .field input {
+    font-family: 'Inter', sans-serif;
+    font-size: .92rem;
+    font-weight: 500;
+    padding: 8px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    background: var(--input-bg);
+    color: var(--accent);
+    width: 240px;
+    text-align: right;
+    transition: border-color .15s;
+    appearance: auto;
+  }
+  .field select:focus, .field input:focus {
+    outline: none;
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(59,109,181,.12);
+  }
+  .field input[type="number"] { font-family: 'JetBrains Mono', monospace; }
+
+  /* ---- RESULT ROWS ---- */
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 9px 0;
+  }
+  .row + .row { border-top: 1px solid var(--border); }
+  .row .lbl {
+    font-size: .88rem;
+    color: var(--text-secondary);
+    flex: 1;
+    padding-right: 12px;
+  }
+  .row .val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .95rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .row.sub .lbl {
+    font-size: .8rem;
+    color: var(--text-muted);
+    padding-left: 16px;
+  }
+  .row.sub .val {
+    font-size: .85rem;
+    color: var(--text-muted);
+  }
+  .row.negative .val { color: var(--red); }
+  .row.green .val { color: var(--green); font-style: italic; }
+
+  /* ---- HIGHLIGHT ROWS ---- */
+  .row.highlight {
+    background: var(--accent-light);
+    margin: 6px -16px;
+    padding: 12px 16px;
+    border-radius: 7px;
+    border-top: none;
+  }
+  .row.highlight .lbl { color: var(--accent); font-weight: 600; font-size: .9rem; }
+  .row.highlight .val { color: var(--accent); font-size: 1.05rem; font-weight: 700; }
+
+  .row.total-descontos {
+    background: var(--red-bg);
+    margin: 6px -16px;
+    padding: 12px 16px;
+    border-radius: 7px;
+    border-top: none;
+  }
+  .row.total-descontos .lbl { color: var(--red); font-weight: 600; font-size: .9rem; }
+  .row.total-descontos .val { color: var(--red); font-size: 1.05rem; font-weight: 700; }
+
+  .row.abate-teto {
+    background: var(--orange-bg);
+    margin: 4px -16px;
+    padding: 10px 16px;
+    border-radius: 7px;
+    border-top: none;
+  }
+  .row.abate-teto .lbl { color: var(--orange); font-weight: 500; }
+  .row.abate-teto .val { color: var(--orange); font-weight: 600; }
+
+  /* ---- GRAND TOTAL ---- */
+  .grand-total {
+    background: linear-gradient(135deg, #e6f5ed 0%, #d4edde 100%);
+    margin: 8px -24px -24px;
+    padding: 20px 24px;
+    border-radius: 0 0 var(--radius) var(--radius);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .grand-total .lbl {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--green);
+  }
+  .grand-total .val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--green);
+  }
+
+  /* ---- COMPROMETIMENTO ---- */
+  .row.pct-bar { flex-wrap: wrap; gap: 4px; }
+  .bar-track {
+    width: 100%;
+    height: 6px;
+    background: #e8eaed;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 2px;
+  }
+  .bar-fill {
+    height: 100%;
+    background: var(--red);
+    border-radius: 3px;
+    transition: width .4s ease;
+  }
+
+  /* ---- NOTES ---- */
+  .notes {
+    margin-top: 8px;
+    font-size: .78rem;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+  .notes p { margin-bottom: 3px; }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 600px) {
+    body { padding: 12px 8px 48px; }
+    .field { flex-direction: column; align-items: stretch; gap: 6px; }
+    .field select, .field input { width: 100%; text-align: left; }
+    header h1 { font-size: 1.15rem; }
+    .grand-total { flex-direction: column; gap: 4px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Calculadora de Remuneração — Membros MPF/MPU</h1>
+    <p>Regime de subsídio (parcela única) + GAO + PVTAC + GECO</p>
+  </header>
+
+  <!-- PARÂMETROS -->
+  <div class="card">
+    <div class="card-title">Parâmetros de entrada</div>
+
+    <div class="field">
+      <label for="cargo">Cargo</label>
+      <select id="cargo">
+        <option value="39753.22">Procurador da República</option>
+        <option value="41845.49">Procurador Regional da República</option>
+        <option value="44047.88">Subprocurador-Geral da República</option>
+        <option value="46366.19">Procurador-Geral da República</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="tempo">Tempo de atividade jurídica (anos)</label>
+      <select id="tempo">
+        <option value="0">0</option>
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="15">15</option>
+        <option value="20">20</option>
+        <option value="25">25</option>
+        <option value="30">30</option>
+        <option value="35">35</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="regime">Regime previdenciário</label>
+      <select id="regime">
+        <option value="rpps">RPPS Integral (pré-2013)</option>
+        <option value="rpc" selected>RPC (Funpresp)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="aliqFun">Alíquota de aporte ao Funpresp</label>
+      <select id="aliqFun">
+        <option value="0.065">6,50%</option>
+        <option value="0.070">7,00%</option>
+        <option value="0.075">7,50%</option>
+        <option value="0.080">8,00%</option>
+        <option value="0.085" selected>8,50%</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="saude">Auxílio-saúde mensal (R$)</label>
+      <input type="number" id="saude" value="817.07" min="0" step="0.01">
+    </div>
+
+    <div class="field">
+      <label for="geco">Pontos GECO (0 a 15)</label>
+      <select id="geco">
+        <option value="0">0</option>
+        <option value="1" selected>1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
+        <option value="13">13</option>
+        <option value="14">14</option>
+        <option value="15">15</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- COMPOSIÇÃO BRUTA -->
+  <div class="card">
+    <div class="card-title">Composição da remuneração bruta</div>
+    <div class="row"><span class="lbl">Subsídio básico mensal</span><span class="val" id="vSub"></span></div>
+    <div class="row"><span class="lbl">GECO (pontos × 1/90 do subsídio)</span><span class="val" id="vGeco"></span></div>
+    <div class="row abate-teto" id="rowAbate" style="display:none"><span class="lbl">Abate-teto (excedente s/ PGR)</span><span class="val" id="vAbate"></span></div>
+    <div class="row sub"><span class="lbl">Subtotal subsídio + GECO (após abate-teto)</span><span class="val" id="vSubtotal"></span></div>
+    <div class="row"><span class="lbl">GAO (35% do subsídio básico — indenizatória)</span><span class="val" id="vGao"></span></div>
+    <div class="row"><span class="lbl">PVTAC — Adicional por quinquênio (5% s/ subsídio básico)</span><span class="val" id="vPvtac"></span></div>
+    <div class="row sub"><span class="lbl">Nº de quinquênios: <strong id="vNQuinq"></strong> — Percentual: <strong id="vPctPvtac"></strong></span><span class="val"></span></div>
+    <div class="row"><span class="lbl">Auxílio-saúde (ressarcimento)</span><span class="val" id="vSaude"></span></div>
+    <div class="row highlight"><span class="lbl">Remuneração bruta total</span><span class="val" id="vBruto"></span></div>
+    <div class="row sub"><span class="lbl">Parcelas indenizatórias (GAO + PVTAC + Saúde)</span><span class="val" id="vIndenz"></span></div>
+  </div>
+
+  <!-- DESCONTOS -->
+  <div class="card">
+    <div class="card-title">Descontos obrigatórios</div>
+
+    <div class="row sub" style="border:none;padding-bottom:2px"><span class="lbl" style="padding-left:0;font-weight:600;color:var(--accent)">Contribuição previdenciária</span><span class="val"></span></div>
+    <div class="row sub"><span class="lbl">Base de cálculo previdenciário</span><span class="val" id="vBasePrev"></span></div>
+    <div class="row negative"><span class="lbl">(−) Contribuição RPPS (progressiva)</span><span class="val" id="vRpps"></span></div>
+    <div class="row negative"><span class="lbl">(−) Aporte Funpresp (se RPC)</span><span class="val" id="vFunpresp"></span></div>
+    <div class="row green"><span class="lbl">Contrapartida patronal Funpresp (informativo)</span><span class="val" id="vContra"></span></div>
+
+    <div class="row sub" style="border:none;padding-bottom:2px;margin-top:12px"><span class="lbl" style="padding-left:0;font-weight:600;color:var(--accent)">Imposto de Renda (tabela progressiva)</span><span class="val"></span></div>
+    <div class="row sub"><span class="lbl">Base de cálculo IRPF</span><span class="val" id="vBaseIrpf"></span></div>
+    <div class="row negative"><span class="lbl">(−) IRPF calculado</span><span class="val" id="vIrpf"></span></div>
+    <div class="row sub"><span class="lbl">Alíquota efetiva IRPF</span><span class="val" id="vAliqEf"></span></div>
+
+    <div class="row sub" style="border:none;padding-bottom:2px;margin-top:12px"><span class="lbl" style="padding-left:0;font-weight:600;color:var(--accent)">Outros descontos</span><span class="val"></span></div>
+    <div class="row negative"><span class="lbl">(−) Contribuição ANPR (1% do subsídio básico)</span><span class="val" id="vAnpr"></span></div>
+
+    <div class="row total-descontos"><span class="lbl">Total de descontos</span><span class="val" id="vTotDesc"></span></div>
+  </div>
+
+  <!-- LÍQUIDA -->
+  <div class="card">
+    <div class="card-title">Remuneração líquida</div>
+    <div class="row"><span class="lbl">Subsídio + GECO líquido (após abate-teto e descontos)</span><span class="val" id="vSubLiq"></span></div>
+    <div class="row"><span class="lbl">GAO (indenizatória, isenta)</span><span class="val" id="vGaoLiq"></span></div>
+    <div class="row"><span class="lbl">PVTAC (indenizatória, isenta)</span><span class="val" id="vPvtacLiq"></span></div>
+    <div class="row"><span class="lbl">Auxílio-saúde (indenizatório, isento)</span><span class="val" id="vSaudeLiq"></span></div>
+    <div class="grand-total">
+      <span class="lbl">Remuneração líquida total</span>
+      <span class="val" id="vLiqTotal"></span>
+    </div>
+  </div>
+
+  <!-- COMPROMETIMENTO -->
+  <div class="card">
+    <div class="row pct-bar">
+      <span class="lbl">Comprometimento c/ descontos (% do subsídio + GECO)</span>
+      <span class="val" id="vComprom" style="color:var(--red)"></span>
+      <div class="bar-track"><div class="bar-fill" id="barFill"></div></div>
+    </div>
+  </div>
+
+  <!-- NOTAS -->
+  <div class="notes">
+    <p>• Subsídio básico mensal conforme cargo selecionado. Subsídio do PGR (base dos percentuais): R$ 46.366,19.</p>
+    <p>• GAO: Gratificação de Atividade Obrigatória, 35% do subsídio básico, indenizatória.</p>
+    <p>• PVTAC: Parcela por Vinculação ao Tempo de Atividade na Carreira, 5% do subsídio básico por quinquênio, indenizatória.</p>
+    <p>• GECO: cada ponto = 1/90 do subsídio básico. Se subsídio + GECO > PGR, aplica-se abate-teto.</p>
+    <p>• Parcelas indenizatórias (GAO, PVTAC, auxílio-saúde) não integram base de IRPF nem de contribuição previdenciária.</p>
+    <p>• IRPF: tabela progressiva mensal (Lei nº 14.848/2024). RPPS: alíquotas progressivas da EC 103/2019 (faixas 2025).</p>
+    <p>• Teto RGPS 2025: R$ 8.157,41. Contrapartida patronal Funpresp: informativo.</p>
+  </div>
+</div>
+
+<script>
+const PGR = 46366.19;
+const TETO_RGPS = 8157.41;
+
+const IRPF_FAIXAS = [
+  { ate: 2259.20, aliq: 0.00, ded: 0.00 },
+  { ate: 2826.65, aliq: 0.075, ded: 169.44 },
+  { ate: 3751.05, aliq: 0.15, ded: 381.44 },
+  { ate: 4664.68, aliq: 0.225, ded: 662.77 },
+  { ate: Infinity, aliq: 0.275, ded: 896.00 },
+];
+
+const RPPS_FAIXAS = [
+  { ate: 1518.00, aliq: 0.075 },
+  { ate: 2793.88, aliq: 0.09 },
+  { ate: 5839.45, aliq: 0.12 },
+  { ate: 8157.41, aliq: 0.14 },
+  { ate: 13969.69, aliq: 0.145 },
+  { ate: 27938.95, aliq: 0.165 },
+  { ate: 44008.52, aliq: 0.19 },
+  { ate: Infinity, aliq: 0.22 },
+];
+
+function calcIrpf(base) {
+  if (base <= IRPF_FAIXAS[0].ate) return 0;
+  for (let i = 1; i < IRPF_FAIXAS.length; i++) {
+    if (base <= IRPF_FAIXAS[i].ate) {
+      return base * IRPF_FAIXAS[i].aliq - IRPF_FAIXAS[i].ded;
+    }
+  }
+  const last = IRPF_FAIXAS[IRPF_FAIXAS.length - 1];
+  return base * last.aliq - last.ded;
+}
+
+function calcRpps(base) {
+  let contrib = 0, prev = 0;
+  for (const f of RPPS_FAIXAS) {
+    const top = Math.min(base, f.ate);
+    if (top > prev) contrib += (top - prev) * f.aliq;
+    prev = f.ate;
+    if (base <= f.ate) break;
+  }
+  return contrib;
+}
+
+function fmt(v) {
+  return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function pct(v) {
+  return (v * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+}
+
+function calc() {
+  const subsidio = parseFloat(document.getElementById('cargo').value);
+  const tempo = parseInt(document.getElementById('tempo').value);
+  const regime = document.getElementById('regime').value;
+  const aliqFun = parseFloat(document.getElementById('aliqFun').value);
+  const saude = parseFloat(document.getElementById('saude').value) || 0;
+  const gecoPts = parseInt(document.getElementById('geco').value);
+
+  // Composição bruta
+  const geco = gecoPts * (subsidio / 90);
+  const abateTeto = Math.max(subsidio + geco - PGR, 0);
+  const subtotal = subsidio + geco - abateTeto;
+  const gao = subsidio * 0.35;
+  const nQuinq = Math.floor(tempo / 5);
+  const pvtac = nQuinq * 0.05 * subsidio;
+  const bruto = subtotal + gao + pvtac + saude;
+  const indenz = gao + pvtac + saude;
+
+  // Descontos
+  const basePrev = regime === 'rpps' ? subtotal : Math.min(subtotal, TETO_RGPS);
+  const rpps = calcRpps(basePrev);
+  const funpresp = regime === 'rpc' ? Math.max(subtotal - TETO_RGPS, 0) * aliqFun : 0;
+  const baseIrpf = subtotal - rpps - funpresp;
+  const irpf = calcIrpf(baseIrpf);
+  const aliqEf = subtotal > 0 ? irpf / subtotal : 0;
+  const anpr = subsidio * 0.01;
+  const totDesc = rpps + funpresp + irpf + anpr;
+
+  // Líquida
+  const subLiq = subtotal - totDesc;
+  const liqTotal = subLiq + gao + pvtac + saude;
+  const comprom = subtotal > 0 ? totDesc / subtotal : 0;
+
+  // Render
+  document.getElementById('vSub').textContent = fmt(subsidio);
+  document.getElementById('vGeco').textContent = fmt(geco);
+
+  const rowAbate = document.getElementById('rowAbate');
+  if (abateTeto > 0) {
+    rowAbate.style.display = 'flex';
+    document.getElementById('vAbate').textContent = '− ' + fmt(abateTeto);
+  } else {
+    rowAbate.style.display = 'none';
+  }
+
+  document.getElementById('vSubtotal').textContent = fmt(subtotal);
+  document.getElementById('vGao').textContent = fmt(gao);
+  document.getElementById('vPvtac').textContent = fmt(pvtac);
+  document.getElementById('vNQuinq').textContent = nQuinq;
+  document.getElementById('vPctPvtac').textContent = pct(nQuinq * 0.05);
+  document.getElementById('vSaude').textContent = fmt(saude);
+  document.getElementById('vBruto').textContent = fmt(bruto);
+  document.getElementById('vIndenz').textContent = fmt(indenz);
+
+  document.getElementById('vBasePrev').textContent = fmt(basePrev);
+  document.getElementById('vRpps').textContent = fmt(rpps);
+  document.getElementById('vFunpresp').textContent = fmt(funpresp);
+  document.getElementById('vContra').textContent = fmt(funpresp);
+  document.getElementById('vBaseIrpf').textContent = fmt(baseIrpf);
+  document.getElementById('vIrpf').textContent = fmt(irpf);
+  document.getElementById('vAliqEf').textContent = pct(aliqEf);
+  document.getElementById('vAnpr').textContent = fmt(anpr);
+  document.getElementById('vTotDesc').textContent = fmt(totDesc);
+
+  document.getElementById('vSubLiq').textContent = fmt(subLiq);
+  document.getElementById('vGaoLiq').textContent = fmt(gao);
+  document.getElementById('vPvtacLiq').textContent = fmt(pvtac);
+  document.getElementById('vSaudeLiq').textContent = fmt(saude);
+  document.getElementById('vLiqTotal').textContent = fmt(liqTotal);
+  document.getElementById('vComprom').textContent = pct(comprom);
+  document.getElementById('barFill').style.width = Math.min(comprom * 100, 100) + '%';
+}
+
+// Event listeners
+document.querySelectorAll('select, input').forEach(el => {
+  el.addEventListener('change', calc);
+  el.addEventListener('input', calc);
+});
+
+calc();
+</script>
+</body>
+</html>
